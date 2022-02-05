@@ -12,6 +12,8 @@ export class Deck {
   @Column()
   shuffled: boolean;
 
-  @OneToMany(() => CardToDeck, (cardToDeck) => cardToDeck.deck)
+  @OneToMany(() => CardToDeck, (cardToDeck) => cardToDeck.deck, {
+    cascade: true,
+  })
   cardsToDecks: CardToDeck[];
 }
