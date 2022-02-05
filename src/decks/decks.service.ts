@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Card } from 'src/cards/card.entity';
-import { UtilFunctions } from 'src/common/util-functions';
+import { Card } from '../cards/card.entity';
+import { UtilFunctions } from '../common/util-functions';
 import { Repository } from 'typeorm';
 import { CardToDeck } from './card-to-deck.entity';
 import { Deck } from './deck.entity';
@@ -9,6 +9,7 @@ import { CreateDeckRequest } from './dto/create-deck.request';
 import { DrawCardsRequest as DrawCardsRequest } from './dto/draw-cards.request';
 import { DrawCardsResponse } from './dto/draw-cards.response';
 import { OpenDeckResponse } from './dto/open-deck.response';
+import { DeckType } from '../domain-constants';
 
 @Injectable()
 export class DecksService {
@@ -21,11 +22,13 @@ export class DecksService {
     private readonly cardsToDecksRepository: Repository<CardToDeck>,
   ) {}
 
-  public async getDecks(): Promise<Deck[]> {
+  public async getAllDecks(): Promise<Deck[]> {
     return await this.decksRepository.find();
   }
 
-  public async createDeck(request: CreateDeckRequest): Promise<Deck> {
+  public async createDeck(
+    request: CreateDeckRequest,
+  ): Promise<OpenDeckResponse> {
     const allCards = await this.cardsRepository.find();
     const cardsToInclude =
       request.type === 'SHORT'
@@ -45,7 +48,12 @@ export class DecksService {
       })),
     });
 
-    return createdDeck;
+    return {
+      deckId: createdDeck.id,
+      type: createdDeck.type,
+      shuffled: createdDeck.shuffled,
+      remaining: createdDeck.cardsToDecks.length,
+    };
   }
 
   public async getDeck(id: string): Promise<OpenDeckResponse> {
@@ -59,7 +67,7 @@ export class DecksService {
 
     return {
       deckId: deckWithCards.id,
-      type: deckWithCards.type == 'FULL' ? 'FULL' : 'SHORT',
+      type: deckWithCards.type as DeckType,
       shuffled: deckWithCards.shuffled,
       remaining: deckWithCards.cardsToDecks.length,
       cards: deckWithCards.cardsToDecks.map(({ card }) => ({
@@ -77,7 +85,8 @@ export class DecksService {
       .createQueryBuilder('cardsToDecks')
       .leftJoinAndSelect('cardsToDecks.card', 'card')
       .where('cardsToDecks.deckId = :deckId', { deckId: request.deckId })
-      .orderBy('cardsToDecks.order', 'ASC')
+      // draw cards from the top of the deck
+      .orderBy('cardsToDecks.order', 'DESC')
       .take(request.count)
       .getMany();
 

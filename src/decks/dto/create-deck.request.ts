@@ -1,4 +1,6 @@
+import { DeckType } from '../../domain-constants';
+
 export class CreateDeckRequest {
-  type!: 'FULL' | 'SHORT';
+  type!: DeckType;
   shuffled!: boolean;
 }
