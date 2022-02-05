@@ -1,6 +1,6 @@
 import { Factory, Seeder } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
-import { CardType } from '../cards/card-type.entity';
+import { Card } from '../cards/card.entity';
 
 const cardValues = [
   '2',
@@ -25,7 +25,7 @@ const cardSuits = ['HEARTS', 'SPADES', 'CLUBS', 'DIAMONDS'];
 const cartesian = (...a) =>
   a.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())));
 
-export default class CreateCardTypes implements Seeder {
+export default class CreateCards implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     const values = cartesian(cardSuits, cardValues).map(
       ([suit, value]: string[], index: number) => ({
@@ -40,7 +40,7 @@ export default class CreateCardTypes implements Seeder {
     await connection
       .createQueryBuilder()
       .insert()
-      .into(CardType)
+      .into(Card)
       .values(values)
       .execute();
   }

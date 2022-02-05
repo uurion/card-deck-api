@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { CardToDeck as CardToDeck } from './card-to-deck.entity';
 
 @Entity('deck')
-export class CardType {
+export class Deck {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -10,4 +11,7 @@ export class CardType {
 
   @Column()
   shuffled: boolean;
+
+  @OneToMany(() => CardToDeck, (cardToDeck) => cardToDeck.deck)
+  cardsToDecks: CardToDeck[];
 }
