@@ -6,7 +6,7 @@ Card Deck API is build with Nest.js
 
 * Setup Postgres Container
 ```bash
-$ docker-compose run
+$ docker-compose up -d
 ```
 
 ```bash
@@ -25,6 +25,6 @@ $ npm run seed:run
 
 ## Running the app
 
-```bash
-$ npm run start
-```
+* Click Debug in VS Code to Run
+* Open `http://localhost:3000/api/` for Swagger or
+* Call `http://localhost:3000/` through Postman
