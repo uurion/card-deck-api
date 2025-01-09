@@ -15,5 +15,6 @@ export class Deck {
   @OneToMany(() => CardToDeck, (cardToDeck) => cardToDeck.deck, {
     cascade: true,
   })
+  
   cardsToDecks: CardToDeck[];
 }
